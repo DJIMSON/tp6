@@ -14,7 +14,7 @@ pipeline {
         // Étape 1 : Récupération du code source depuis GitHub
         stage("Checkout") {
             steps {
-                git branch: 'master', url: 'https://github.com/DJIMSON/Tp6_docker.git'
+                git branch: 'master', url: 'https://github.com/DJIMSON/tp6.git'
             }
         }
         // Étape 2 : Exécution des tests
