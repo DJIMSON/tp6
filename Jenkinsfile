@@ -35,7 +35,7 @@ pipeline {
         stage("Push image to Docker Hub") {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'credentials_docker_hub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]){
+                    withCredentials([usernamePassword(credentialsId: 'credentials_dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]){
                     bat """
                     docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
                     echo 'Docker login successful'
