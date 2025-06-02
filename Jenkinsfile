@@ -1,15 +1,16 @@
 // Déclaration du pipeline Jenkins
 pipeline {
-    // Exécute le pipeline sur n'importe quel agent
-    agent any
-    // Déclarer les variables d'environnement globales
+    // Forcer l’exécution sur un agent Windows (assure-toi que ton nœud Windows porte bien le label "windows")
+    agent { label 'windows' }
+
+    // Variables d’environnement globales
     environment {
-        DOCKER_USERNAME = "Djimson" // username docker
-        IMAGE_VERSION = "1.${BUILD_NUMBER}"  // version dynamique de l’image
-        DOCKER_IMAGE = "${DOCKER_USERNAME}/tp-app:${IMAGE_VERSION}" // nom de l’image docker
-        DOCKER_CONTAINER = "ci-cd-html-css-app"  // nom du conteneur
+        DOCKER_USERNAME   = "Djimson"                              // Ton identifiant Docker Hub
+        IMAGE_VERSION     = "1.${BUILD_NUMBER}"                    // Version dynamique de l’image
+        DOCKER_IMAGE      = "${DOCKER_USERNAME}/tp-app:${IMAGE_VERSION}" // Nom complet de l’image Docker
+        DOCKER_CONTAINER  = "ci-cd-html-css-app"                   // Nom du conteneur lors du déploiement
     }
-    // Les étapes du pipeline
+
     stages {
         // Étape 1 : Récupération du code source depuis GitHub
         stage("Checkout") {
@@ -17,48 +18,53 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/DJIMSON/tp6.git'
             }
         }
-        // Étape 2 : Exécution des tests
+
+        // Étape 2 : Exécution des tests (placeholder pour tes vrais tests)
         stage("Test") {
             steps {
                 echo "Tests en cours"
             }
         }
-        // Étape 3 : Création de l'image Docker
+
+        // Étape 3 : Création de l’image Docker
         stage("Build Docker Image") {
             steps {
-                script {
-                    bat "docker build -t $DOCKER_IMAGE ."
-                }
+                // Sur Windows, dans un bloc "bat", on utilise %VARIABLE% pour les variables d’environnement
+                bat "docker build -t %DOCKER_IMAGE% ."
             }
         }
-        // Étape 4 : Publication de l'image sur Docker Hub
+
+        // Étape 4 : Publication de l’image sur Docker Hub
         stage("Push image to Docker Hub") {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'credentials_dockerHub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]){
+                withCredentials([usernamePassword(
+                    credentialsId: 'credentials_dockerHub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
                     bat """
-                    docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}
-                    echo 'Docker login successful'
-                    docker push $DOCKER_IMAGE
+                        docker login -u %DOCKER_USER% -p %DOCKER_PASSWORD%
+                        echo Docker login successful
+                        docker push %DOCKER_IMAGE%
                     """
-                    }
                 }
             }
         }
-        // Étape 5 : Déploiement de l'application
+
+        // Étape 5 : Déploiement de l’application
         stage("Deploy") {
             steps {
-                script {
-                    bat """
-                    # Arrête le conteneur s'il existe
-                    docker container stop $DOCKER_CONTAINER || true
-                    # supprime le conteneur s'il existe
-                    docker container rm $DOCKER_CONTAINER || true
-                    # Lance un nouveau conteneur en mode détaché(en arrière-plan )
-                    docker container run -d --name $DOCKER_CONTAINER -p 8080:80 $DOCKER_IMAGE
-                    """
-                }
-            } 
+                bat """
+                    REM Arrête le conteneur s'il existe
+                    docker container stop %DOCKER_CONTAINER% || echo "Conteneur non trouvé"
+                    
+                    REM Supprime le conteneur s'il existe
+                    docker container rm %DOCKER_CONTAINER% || echo "Conteneur non trouvé"
+                    
+                    REM Lance un nouveau conteneur en arrière-plan
+                    docker container run -d --name %DOCKER_CONTAINER% -p 8080:80 %DOCKER_IMAGE%
+                """
+            }
         }
     }
 }
