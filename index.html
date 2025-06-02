@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire de Transport - Djimson Company</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #012340;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            max-width: 450px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+        }
+        label {
+            font-weight: bold;
+            color: #012340;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f4f4f4;
+        }
+        button {
+            background-color: #ff9900;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #cc7a00;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            display: none;
+        }
+        .success {
+            color: green;
+            font-size: 14px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Formulaire de Transport - Djimson Company</h2>
+        <form id="transportForm">
+            <label for="nom">Nom complet :</label>
+            <input type="text" id="nom" name="nom" required>
+            <span class="error" id="errorNom">Veuillez entrer votre nom.</span>
+
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" required>
+            <span class="error" id="errorEmail">Veuillez entrer un email valide.</span>
+
+            <label for="telephone">Téléphone :</label>
+            <input type="tel" id="telephone" name="telephone" required>
+            <span class="error" id="errorTelephone">Veuillez entrer un numéro valide.</span>
+
+            <label for="destination">Destination :</label>
+            <input type="text" id="destination" name="destination" required>
+
+            <label for="type_transport">Type de transport :</label>
+            <select id="type_transport" name="type_transport">
+                <option value="bus">Bus</option>
+                <option value="train">Train</option>
+                <option value="avion">Avion</option>
+            </select>
+
+            <label for="date">Date du transport :</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="message">Commentaires (max 200 caractères) :</label>
+            <textarea id="message" name="message" rows="4" maxlength="200"></textarea>
+            <span class="error" id="errorMessage">Limite de 200 caractères dépassée.</span>
+
+            <button type="submit">Envoyer la demande</button>
+            <p class="success" id="successMessage">Formulaire envoyé avec succès !</p>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("transportForm").addEventListener("submit", function(event) {
+            let valid = true;
+
+            // Validation du nom
+            let nom = document.getElementById("nom").value.trim();
+            if (nom === "") {
+                document.getElementById("errorNom").style.display = "block";
+                valid = false;
+            } else {
+                document.getElementById("errorNom").style.display = "none";
+            }
+
+            // Validation de l'email
+            let email = document.getElementById("email").value.trim();
+            let emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+            if (!emailPattern.test(email)) {
+                document.getElementById("errorEmail").style.display = "block";
+                valid = false;
+            } else {
+                document.getElementById("errorEmail").style.display = "none";
+            }
+
+            // Validation du téléphone
+            let telephone = document.getElementById("telephone").value.trim();
+            let phonePattern = /^[0-9]{10}$/;
+            if (!phonePattern.test(telephone)) {
+                document.getElementById("errorTelephone").style.display = "block";
+                valid = false;
+            } else {
+                document.getElementById("errorTelephone").style.display = "none";
+            }
+
+            // Validation du message
+            let message = document.getElementById("message").value.trim();
+            if (message.length > 200) {
+                document.getElementById("errorMessage").style.display = "block";
+                valid = false;
+            } else {
+                document.getElementById("errorMessage").style.display = "none";
+            }
+
+            if (!valid) {
+                event.preventDefault(); // Empêche l'envoi si le formulaire est invalide
+            } else {
+                event.preventDefault();
+                document.getElementById("successMessage").style.display = "block";
+                setTimeout(() => {
+                    document.getElementById("successMessage").style.display = "none";
+                    document.getElementById("transportForm").reset();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
